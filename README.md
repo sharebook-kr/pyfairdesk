@@ -2,6 +2,6 @@
 python wrapper of the Fairdesk API 
 
 
-# 회원 가입
+# Fairdesk Sign up
 
-[Fairdesk 가입 링크](https://www.fairdesk.com/signup?channels=pyquant&vipCode=pyquant)
+[Fairdesk Sign up Referral](https://www.fairdesk.com/signup?channels=pyquant&vipCode=pyquant)
