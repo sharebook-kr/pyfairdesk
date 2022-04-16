@@ -14,6 +14,7 @@ $ pip install pyfairdesk
 
 # API Usage
 ## Load Markets
+[official document](https://github.com/fairdesk/fairdesk-api-docs#queryproductinfo)
 
 ```
 import pyfairdesk
