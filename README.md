@@ -20,4 +20,4 @@ import pyfairdesk
 
 exchange = pyfairdesk.Fairdesk()
 exchange.load_markets()
-``
+```
