@@ -3,7 +3,6 @@
 import time
 import hmac
 import hashlib
-import urllib
 import json
 import requests
 
@@ -33,16 +32,20 @@ class Fairdesk:
         resp = requests.get(url)
         return resp.json()
 
-    def _generate_signature(self, url_path, query_string, body, expiry):
-        message = url_path + query_string + str(expiry) + urllib.parse.urlencode(body)
+    def _generate_signature(self, url_path, query_string, body: dict, expiry):
+        if len(body) != 0:
+            message = url_path + query_string + str(expiry) + json.dumps(body)
+        else:
+            message = url_path + query_string + str(expiry)
+
         return  hmac.new(
             self.api_secret.encode('utf-8'),
             message.encode('utf-8'),
             hashlib.sha256).hexdigest()
 
-    def _post_request(self, url_path:str, query_string:str, body:dict):
+    def _post_request(self, url_path:str, body:dict):
         expiry = int(time.time() * 1000000)
-        signatue = self._generate_signature(url_path, query_string, body, expiry)
+        signatue = self._generate_signature(url_path, "", body, expiry)
 
         headers = {
             "x-fairdesk-access-key": self.api_key,
@@ -56,7 +59,7 @@ class Fairdesk:
 
     def _get_request(self, url_path: str, params: str=""):
         expiry = int(time.time() * 1000000)
-        signatue = self._generate_signature(url_path, params, body="", expiry=expiry)
+        signatue = self._generate_signature(url_path, params, body={}, expiry=expiry)
 
         headers = {
             "x-fairdesk-access-key": self.api_key,
@@ -68,14 +71,114 @@ class Fairdesk:
         resp = requests.get(url=url, headers=headers, params=params)
         return resp.json()
 
-    def fetch_positions(self):
+    def fetch_positions(self) -> dict:
         """query current furture positions
 
         Returns:
-            _type_: _description_
+            dict : _description_
         """
         return self._get_request("/api/v1/private/account/positions")
 
+    def fetch_open_orders(self) -> dict:
+        """fetch open orders
+
+        Returns:
+            dict: _description_
+        """
+        return self._get_request("/api/v1/private/trade/open-orders")
+
+    def fetch_balance(self) -> dict:
+        """fetch balance
+
+        Returns:
+            dict: balance
+        """
+        return self._get_request("/api/v1/private/account/balance")
+
+    def _create_order(self, symbol: str, side: str, position: str,
+                      isolated: bool, amount: float, price: float,
+                      order_type: str) -> dict:
+        data = {
+            "symbol": symbol,
+            "side": side,
+            "positionSide": position,
+            "isolated": isolated,
+            "quantity": str(amount),
+            "price": str(price),
+            "type": order_type,
+        }
+        return self._post_request("/api/v1/private/trade/place-order", data)
+
+    def create_limit_buy_order(self, symbol: str, position: str, isolated: bool,
+                               amount: float, price: float) -> dict:
+        """_summary_
+
+        Args:
+            symbol (str): symbol (btcusdt)
+            position (str): long, short
+            isolated (bool): True, False
+            amount (float): quantity
+            price (float): price
+
+        Returns:
+            dict: _description_
+        """
+        return self._create_order(symbol, "BUY", position.upper(), isolated,
+                                  amount, price, "LIMIT")
+
+    def cancel_all_orders(self, symbol: str="btcusdt") -> dict:
+        """cancel all orders
+
+        Returns:
+            dict: _description_
+        """
+        data = {
+            "symbol": symbol,
+            "settleCcy": "USDT"
+        }
+        return self._post_request("/api/v1/private/trade/cancel-all-order", data)
+
+    def cancel_order(self, symbol: str, order_id: str) -> dict:
+        """cancel single order by order_id
+
+        Args:
+            symbol (str): symbol (btcusdt)
+            order_id (str): order id to cancel
+
+        Returns:
+            dict: basic output format
+        """
+        data = {
+            "symbol": symbol,
+            "orderId": order_id
+        }
+        return self._post_request("/api/v1/private/trade/cancel-order", body=data)
+
+    def fetch_symbol_config(self) -> dict:
+        """fetch symbol config
+
+        Returns:
+            dict: _description_
+        """
+        return self._get_request("/api/v1/private/account/symbol-config")
+
+    def adjust_leverage(self, symbol: str, isolated: bool, leverage: int) -> dict:
+        """adjust leverage
+
+        Args:
+            symbol (str): _description_
+            isolated (bool): _description_
+            leverage (int): _description_
+
+        Returns:
+            dict: _description_
+        """
+        data = {
+            "symbol": symbol,
+            "leverage": str(leverage),
+            "isolated": isolated
+        }
+        return self._post_request("/api/v1/private/account/config/adjust-leverage", data)
 
 
 if __name__ == "__main__":
@@ -87,7 +190,5 @@ if __name__ == "__main__":
         secret = lines[1].strip()
 
     exchange = Fairdesk(key, secret)
-    markets = exchange.load_markets()
-    print(len(markets['data']))
-
-    pprint.pprint(exchange.fetch_positions())
+    resp = exchange.create_limit_buy_order("btcusdt", "long", True, 0.001, 40000)
+    pprint.pprint(resp)
