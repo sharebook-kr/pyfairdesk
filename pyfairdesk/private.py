@@ -45,7 +45,7 @@ class Fairdesk:
             hashlib.sha256).hexdigest()
 
     def _put_request(self, url_path:str, body:dict):
-        expiry = int(time.time() * 1000000)
+        expiry = int(time.time() * 1000000 + 60 * 1000000)
         signatue = self._generate_signature(url_path, "", body, expiry)
 
         headers = {
@@ -59,7 +59,7 @@ class Fairdesk:
         return resp.json()
 
     def _post_request(self, url_path:str, body:dict):
-        expiry = int(time.time() * 1000000 + 1000)
+        expiry = int(time.time() * 1000000 + 60 * 1000000)
         signatue = self._generate_signature(url_path, "", body, expiry)
 
         headers = {
@@ -73,7 +73,7 @@ class Fairdesk:
         return resp.json()
 
     def _get_request(self, url_path: str, params: str=""):
-        expiry = int(time.time() * 1000000)
+        expiry = int(time.time() * 1000000 + 60 * 1000000)
         signatue = self._generate_signature(url_path, params, body={}, expiry=expiry)
 
         headers = {
