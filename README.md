@@ -40,7 +40,7 @@ data = resp['data']
 pprint.pprint(data)
 ```
 
-## isolated and leverage
+## Margin mode and leverage
 
 ```
 import pyfairdesk
@@ -55,6 +55,16 @@ resp = exchange.fetch_symbol_config()
 data = resp['data']
 for symbol in data:
     print(symbol)
+```
+
+**response**
+```
+{'symbol': 'axsusdt', 'crossLeverage': 20, 'isolatedLeverage': 20, 'makerFeeRate': '0.00018', 'takerFeeRate': '0.00028'}
+{'symbol': 'thetausdt', 'crossLeverage': 20, 'isolatedLeverage': 20, 'makerFeeRate': '0.00018', 'takerFeeRate': '0.00028'}
+{'symbol': 'linkusdt', 'crossLeverage': 20, 'isolatedLeverage': 20, 'makerFeeRate': '0.00018', 'takerFeeRate': '0.00028'}
+{'symbol': 'ftmusdt', 'crossLeverage': 20, 'isolatedLeverage': 20, 'makerFeeRate': '0.00018', 'takerFeeRate': '0.00028'}
+{'symbol': 'xlmusdt', 'crossLeverage': 20, 'isolatedLeverage': 20, 'makerFeeRate': '0.00018', 'takerFeeRate': '0.00028'}
+{'symbol': 'sushiusdt', 'crossLeverage': 20, 'isolatedLeverage': 20, 'makerFeeRate': '0.00018', 'takerFeeRate': '0.00028'}
 ```
 
 ## order
