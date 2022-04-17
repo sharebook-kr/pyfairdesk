@@ -43,6 +43,20 @@ class Fairdesk:
             message.encode('utf-8'),
             hashlib.sha256).hexdigest()
 
+    def _put_request(self, url_path:str, body:dict):
+        expiry = int(time.time() * 1000000)
+        signatue = self._generate_signature(url_path, "", body, expiry)
+
+        headers = {
+            "x-fairdesk-access-key": self.api_key,
+            "x-fairdesk-request-expiry": str(expiry),
+            "x-fairdesk-request-signature": signatue
+        }
+
+        url = self.BASE_ENDPOINT + url_path
+        resp = requests.put(url=url, headers=headers, data=json.dumps(body))
+        return resp.json()
+
     def _post_request(self, url_path:str, body:dict):
         expiry = int(time.time() * 1000000)
         signatue = self._generate_signature(url_path, "", body, expiry)
@@ -178,7 +192,7 @@ class Fairdesk:
             "leverage": str(leverage),
             "isolated": isolated
         }
-        return self._post_request("/api/v1/private/account/config/adjust-leverage", data)
+        return self._put_request("/api/v1/private/account/config/adjust-leverage", data)
 
 
 if __name__ == "__main__":
@@ -190,5 +204,7 @@ if __name__ == "__main__":
         secret = lines[1].strip()
 
     exchange = Fairdesk(key, secret)
-    resp = exchange.create_limit_buy_order("btcusdt", "long", True, 0.001, 40000)
+    resp = exchange.adjust_leverage(symbol="btcusdt", isolated=True, leverage=2)
     pprint.pprint(resp)
+    #resp = exchange.create_limit_buy_order("btcusdt", "long", True, 0.001, 40000)
+    #pprint.pprint(resp)
