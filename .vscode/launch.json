@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "cwd": "${fileDirname}",
-            "env": {"PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"}
+            "env": {"PYTHONPATH": "${cwd}"}
         }
     ]
 }
