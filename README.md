@@ -40,6 +40,22 @@ data = resp['data']
 pprint.pprint(data)
 ```
 
+**response**
+```
+{'accounts': [{'accountBalance': '463.56',
+               'availBalance': '463.56',
+               'bonus': '35.00',
+               'currency': 'USDT',
+               'display': 'Tether',
+               'icon': 'https://sgtnstatic-1306519353.cos.ap-singapore.myqcloud.com/currency/USDT.png',
+               'positionMargin': '0.00',
+               'unRealizedPnL': '0.00'}],
+ 'marginBalanceBtc': '0.01149596',
+ 'marginBalanceUsd': '463.56',
+ 'totalAccountBalance': '463.56',
+ 'totalUnRealizedPnL': '0.00'}
+ ```
+
 ## Margin mode and leverage
 
 ```
