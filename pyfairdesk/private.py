@@ -55,7 +55,7 @@ class Fairdesk:
         }
 
         url = self.BASE_ENDPOINT + url_path
-        resp = requests.put(url=url, headers=headers, data=json.dumps(body))
+        resp = requests.put(url=url, headers=headers, json=body)
         return resp.json()
 
     def _post_request(self, url_path:str, body:dict):
@@ -206,7 +206,7 @@ if __name__ == "__main__":
         secret = lines[1].strip()
 
     exchange = Fairdesk(key, secret)
-    #resp = exchange.adjust_leverage(symbol="btcusdt", isolated=True, leverage=2)
-    #pprint.pprint(resp)
-    resp = exchange.create_limit_buy_order("btcusdt", "long", True, 0.001, 40000)
+    resp = exchange.adjust_leverage(symbol="btcusdt", isolated=True, leverage=2)
     pprint.pprint(resp)
+    #resp = exchange.create_limit_buy_order("btcusdt", "long", True, 0.001, 40000)
+    #pprint.pprint(resp)
