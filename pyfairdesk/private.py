@@ -5,6 +5,7 @@ import hmac
 import hashlib
 import json
 import requests
+from datetime import datetime
 
 
 class Fairdesk:
@@ -58,7 +59,7 @@ class Fairdesk:
         return resp.json()
 
     def _post_request(self, url_path:str, body:dict):
-        expiry = int(time.time() * 1000000)
+        expiry = int(time.time() * 1000000 + 1000)
         signatue = self._generate_signature(url_path, "", body, expiry)
 
         headers = {
@@ -68,7 +69,7 @@ class Fairdesk:
         }
 
         url = self.BASE_ENDPOINT + url_path
-        resp = requests.post(url=url, headers=headers, data=json.dumps(body))
+        resp = requests.post(url=url, headers=headers, json=body)
         return resp.json()
 
     def _get_request(self, url_path: str, params: str=""):
@@ -116,10 +117,11 @@ class Fairdesk:
             "symbol": symbol,
             "side": side,
             "positionSide": position,
-            "isolated": isolated,
+            "isolated": str(isolated).lower(),
             "quantity": str(amount),
             "price": str(price),
             "type": order_type,
+            "timeInForce": "POST_ONLY"
         }
         return self._post_request("/api/v1/private/trade/place-order", data)
 
@@ -204,7 +206,7 @@ if __name__ == "__main__":
         secret = lines[1].strip()
 
     exchange = Fairdesk(key, secret)
-    resp = exchange.adjust_leverage(symbol="btcusdt", isolated=True, leverage=2)
-    pprint.pprint(resp)
-    #resp = exchange.create_limit_buy_order("btcusdt", "long", True, 0.001, 40000)
+    #resp = exchange.adjust_leverage(symbol="btcusdt", isolated=True, leverage=2)
     #pprint.pprint(resp)
+    resp = exchange.create_limit_buy_order("btcusdt", "long", True, 0.001, 40000)
+    pprint.pprint(resp)
