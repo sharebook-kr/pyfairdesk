@@ -1,3 +1,6 @@
+"""__init__.py
+"""
+
 from pyfairdesk.rest_api import *
 from pyfairdesk.stream_api import *
 

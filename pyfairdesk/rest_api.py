@@ -5,7 +5,6 @@ import hmac
 import hashlib
 import json
 import requests
-from datetime import datetime
 
 
 class Fairdesk:
@@ -81,7 +80,7 @@ class Fairdesk:
         resp = requests.get(url, params=params)
         return resp.json()
 
-    def fetch_24h(self, symbol: str):
+    def fetch_ticker(self, symbol: str):
         """fetch 24h ticker
 
         Args:
@@ -201,35 +200,71 @@ class Fairdesk:
 
     def _create_order(self, symbol: str, side: str, position: str,
                       isolated: bool, amount: float, price: float,
-                      order_type: str) -> dict:
+                      order_type: str, close_position: bool=False) -> dict:
         data = {
             "symbol": symbol,
             "side": side,
             "positionSide": position,
             "isolated": str(isolated).lower(),
             "quantity": str(amount),
-            "price": str(price),
             "type": order_type,
-            "timeInForce": "POST_ONLY"
+            "closePosition": close_position
         }
+        if order_type == "LIMIT":
+            data['price'] = str(price)
+            data['timeInForce'] = "POST_ONLY"
+
         return self._post_request("/api/v1/private/trade/place-order", data)
 
-    def create_limit_buy_order(self, symbol: str, position: str, isolated: bool,
-                               amount: float, price: float) -> dict:
-        """_summary_
+    def create_market_order(self, symbol: str, side: str, amount: float, params = None):
+        """create market order
 
         Args:
-            symbol (str): symbol (btcusdt)
-            position (str): long, short
-            isolated (bool): True, False
-            amount (float): quantity
-            price (float): price
+            symbol (str): symbol
+            side (str): "buy" or "sell"
+            amount (float): amount
+            params (dict): parameters
 
         Returns:
-            dict: _description_
+            _type_: _description_
         """
-        return self._create_order(symbol, "BUY", position.upper(), isolated,
-                                  amount, price, "LIMIT")
+        if side == "buy":
+            position = "LONG"
+        else:
+            position = "SHORT"
+
+        if isinstance(params, dict):
+            close_position = params.get('close_position', False)
+        else:
+            close_position = False
+
+        return self._create_order(symbol, side.upper(), position, True, amount, 0.0, "MARKET", close_position)
+
+    def create_limit_order(self, symbol: str, side: str, amount: float,
+                           price: float, params = None):
+        """create market order
+
+        Args:
+            symbol (str): symbol
+            side (str): "buy" or "sell"
+            amount (float): amount
+            price (float): price
+            params (dict): parameters
+
+        Returns:
+            _type_: _description_
+        """
+        if side == "buy":
+            position = "LONG"
+        else:
+            position = "SHORT"
+
+        if isinstance(params, dict):
+            close_position = params.get('close_position', False)
+        else:
+            close_position = False
+
+        return self._create_order(symbol, side.upper(), position, True, amount, price, "LIMIT", close_position)
 
     def cancel_all_orders(self, symbol: str="btcusdt") -> dict:
         """cancel all orders

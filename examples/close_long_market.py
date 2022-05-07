@@ -1,4 +1,5 @@
-"""adjust leverage
+"""
+Close Long
 """
 import pprint
 import pyfairdesk
@@ -9,5 +10,12 @@ with open("../fairdesk.key", "r", encoding="utf-8") as f:
     secret = lines[1].strip()
 
 exchange = pyfairdesk.Fairdesk(key, secret)
-resp = exchange.adjust_leverage(symbol="btcusdt", isolated=True, leverage=1)
+
+# market order
+resp = exchange.create_market_order(
+    symbol="btcusdt",
+    side="sell",
+    amount="0.001",
+    params={'close_position': True}
+)
 pprint.pprint(resp)
