@@ -1,5 +1,4 @@
-from pyfairdesk.private import *
-from pyfairdesk.public import *
-from pyfairdesk.stream import *
+from pyfairdesk.rest_api import *
+from pyfairdesk.stream_api import *
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"

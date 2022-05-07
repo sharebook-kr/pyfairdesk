@@ -1,4 +1,4 @@
-"""Fairdesk private api
+"""Fairdesk REST api
 """
 import time
 import hmac
@@ -31,6 +31,92 @@ class Fairdesk:
         """
         url = self.BASE_ENDPOINT + "/api/v1/public/products"
         resp = requests.get(url)
+        return resp.json()
+
+    def fetch_order_book(self, symbol: str) -> dict:
+        """fetch order book
+
+        Args:
+            symbol (str): btcusdt
+
+        Returns:
+            dict: _description_
+        """
+        url = self.BASE_ENDPOINT + "/api/v1/public/md/orderbook"
+        params = {"symbol": symbol}
+        resp = requests.get(url, params=params)
+        return resp.json()
+
+    def fetch_recent_trade(self, symbol: str) -> dict:
+        """fetch recent trade
+
+        Args:
+            symbol (str): btcusdt
+
+        Returns:
+            dict: _description_
+        """
+        url = self.BASE_ENDPOINT + "/api/v1/public/md/trade-recent"
+        params = {"symbol": symbol}
+        resp = requests.get(url, params=params)
+        return resp.json()
+
+    def fetch_trade_history(self, symbol: str, fromts: int, limit:int=500):
+        """fetch trade history
+
+        Args:
+            symbol (str): _description_
+            fromts (int): _description_
+            limit (_type_, optional): _description_. Defaults to int.
+
+        Returns:
+            _type_: _description_
+        """
+        url = self.BASE_ENDPOINT + "/api/v1/public/md/trade-history"
+        params = {
+            "symbol": symbol,
+            "from": fromts,
+            "limit": limit
+        }
+        resp = requests.get(url, params=params)
+        return resp.json()
+
+    def fetch_24h(self, symbol: str):
+        """fetch 24h ticker
+
+        Args:
+            symbol (str): ticker (btcusdt)
+
+        Returns:
+            _type_: _description_
+        """
+        url = self.BASE_ENDPOINT + "/api/v1/public/md/ticker24h"
+        params = {"symbol": symbol}
+        resp = requests.get(url, params=params)
+        return resp.json()
+
+    def fetch_ohlcv(self, symbol: str, interval: str, from_ts: int, to_ts: int, limit: int=500):
+        """_summary_
+
+        Args:
+            symbol (str): _description_
+            interval (str): _description_
+            from_ts (int): _description_
+            to_ts (int): _description_
+            limit (int, optional): _description_. Defaults to 500.
+
+        Returns:
+            _type_: _description_
+        """
+        url = self.BASE_ENDPOINT + "/api/v1/public/md/kline"
+        params = {
+            "symbol": symbol,
+            "interval": interval,
+            "from": from_ts,
+            "to": to_ts,
+            "limit": limit
+        }
+        resp = requests.get(url, params=params)
         return resp.json()
 
     def _generate_signature(self, url_path, query_string, body: dict, expiry):

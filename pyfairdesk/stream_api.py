@@ -1,5 +1,5 @@
 """
-Fairdesk Websocket Manager
+Fairdesk Websocket API
 """
 import asyncio
 import json

@@ -11,7 +11,7 @@ with open("README.md", "r", encoding='UTF-8') as fh:
 
 setuptools.setup(
     name='pyfairdesk',
-    version='0.0.2',
+    version='0.0.3',
     author='Jonghun Yoo, Brayden Jo',
     author_email='jonghun.yoo@pyquant.co.kr, brayden.jo@pyquant.co.kr',
     description="python wrapper for Fairdesk API",
