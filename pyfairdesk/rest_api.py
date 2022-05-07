@@ -200,19 +200,22 @@ class Fairdesk:
 
     def _create_order(self, symbol: str, side: str, position: str,
                       isolated: bool, amount: float, price: float,
-                      order_type: str, close_position: bool=False) -> dict:
+                      order_type: str, close_position: bool=False,
+                      time_in_force: str="GTC") -> dict:
         data = {
             "symbol": symbol,
             "side": side,
             "positionSide": position,
             "isolated": str(isolated).lower(),
             "quantity": str(amount),
-            "type": order_type,
+            'type': order_type,
             "closePosition": close_position
         }
+
+        # limit only
         if order_type == "LIMIT":
             data['price'] = str(price)
-            data['timeInForce'] = "POST_ONLY"
+            data['timeInForce'] = time_in_force
 
         return self._post_request("/api/v1/private/trade/place-order", data)
 
@@ -238,7 +241,16 @@ class Fairdesk:
         else:
             close_position = False
 
-        return self._create_order(symbol, side.upper(), position, True, amount, 0.0, "MARKET", close_position)
+        return self._create_order(
+            symbol,
+            side.upper(),
+            position,
+            True,
+            amount,
+            0.0,
+            "MARKET",
+            close_position
+        )
 
     def create_limit_order(self, symbol: str, side: str, amount: float,
                            price: float, params = None):
@@ -259,12 +271,29 @@ class Fairdesk:
         else:
             position = "SHORT"
 
+        # close position
         if isinstance(params, dict):
             close_position = params.get('close_position', False)
         else:
             close_position = False
 
-        return self._create_order(symbol, side.upper(), position, True, amount, price, "LIMIT", close_position)
+        # time in force
+        if isinstance(params, dict):
+            time_in_force = params.get('time_in_force', "GTC")
+        else:
+            time_in_force = False
+
+        return self._create_order(
+            symbol,
+            side.upper(),
+            position,
+            True,
+            amount,
+            price,
+            "LIMIT",
+            close_position,
+            time_in_force
+        )
 
     def cancel_all_orders(self, symbol: str="btcusdt") -> dict:
         """cancel all orders
