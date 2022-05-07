@@ -17,16 +17,7 @@ resp = exchange.create_limit_order(
     side="sell",
     amount="0.001",
     price=37000,
-    params={
-        'close_position': True
-    }
+    params={'reduce_only': True }
 )
 pprint.pprint(resp)
 
-# market order
-#resp = exchange.create_market_order(
-#    symbol="btcusdt",
-#    side="buy",
-#    amount="0.001"
-#)
-#pprint.pprint(resp)

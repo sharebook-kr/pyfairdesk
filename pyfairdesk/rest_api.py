@@ -200,16 +200,14 @@ class Fairdesk:
 
     def _create_order(self, symbol: str, side: str, position: str,
                       isolated: bool, amount: float, price: float,
-                      order_type: str, close_position: bool=False,
-                      time_in_force: str="GTC") -> dict:
+                      order_type: str, time_in_force: str="GTC") -> dict:
         data = {
             "symbol": symbol,
             "side": side,
             "positionSide": position,
             "isolated": str(isolated).lower(),
             "quantity": str(amount),
-            'type': order_type,
-            "closePosition": close_position
+            'type': order_type
         }
 
         # limit only
@@ -231,15 +229,21 @@ class Fairdesk:
         Returns:
             _type_: _description_
         """
-        if side == "buy":
-            position = "LONG"
-        else:
-            position = "SHORT"
-
         if isinstance(params, dict):
-            close_position = params.get('close_position', False)
+            reduce_only = params.get('reduce_only', False)
         else:
-            close_position = False
+            reduce_only = False
+
+        if reduce_only is True:
+            if side == "buy":
+                position = "SHORT"
+            else:
+                position = "LONG"
+        else:
+            if side == "buy":
+                position = "LONG"
+            else:
+                position = "SHORT"
 
         return self._create_order(
             symbol,
@@ -248,8 +252,7 @@ class Fairdesk:
             True,
             amount,
             0.0,
-            "MARKET",
-            close_position
+            "MARKET"
         )
 
     def create_limit_order(self, symbol: str, side: str, amount: float,
@@ -266,16 +269,21 @@ class Fairdesk:
         Returns:
             _type_: _description_
         """
-        if side == "buy":
-            position = "LONG"
-        else:
-            position = "SHORT"
-
-        # close position
         if isinstance(params, dict):
-            close_position = params.get('close_position', False)
+            reduce_only = params.get('reduce_only', False)
         else:
-            close_position = False
+            reduce_only = False
+
+        if reduce_only is True:
+            if side == "buy":
+                position = "SHORT"
+            else:
+                position = "LONG"
+        else:
+            if side == "buy":
+                position = "LONG"
+            else:
+                position = "SHORT"
 
         # time in force
         if isinstance(params, dict):
@@ -291,7 +299,6 @@ class Fairdesk:
             amount,
             price,
             "LIMIT",
-            close_position,
             time_in_force
         )
 
