@@ -69,7 +69,10 @@ class Fairdesk:
         }
 
         url = self.BASE_ENDPOINT + url_path
-        resp = requests.post(url=url, headers=headers, json=body)
+        if len(body) == 0:
+            resp = requests.post(url=url, headers=headers)
+        else:
+            resp = requests.post(url=url, headers=headers, json=body)
         return resp.json()
 
     def _get_request(self, url_path: str, params: str=""):
@@ -196,6 +199,29 @@ class Fairdesk:
         }
         return self._put_request("/api/v1/private/account/config/adjust-leverage", data)
 
+    def create_websocket_token(self) -> dict:
+        """create websocket token
+
+        Returns:
+            dict: token
+        """
+        return self._post_request("/api/v1/private/token/create", body={})
+
+    def refresh_websocket_token(self) -> dict:
+        """refresh websocket token
+
+        Returns:
+            dict: token
+        """
+        return self._post_request("/api/v1/private/token/refresh", body={})
+
+    def delete_websocket_token(self) -> dict:
+        """delete websocket token
+
+        Returns:
+            dict: token
+        """
+        return self._post_request("/api/v1/private/token/delete", body={})
 
 if __name__ == "__main__":
     import pprint
@@ -206,7 +232,8 @@ if __name__ == "__main__":
         secret = lines[1].strip()
 
     exchange = Fairdesk(key, secret)
-    resp = exchange.adjust_leverage(symbol="btcusdt", isolated=True, leverage=2)
-    pprint.pprint(resp)
+    pprint.pprint(exchange.create_websocket_token())
+    #resp = exchange.adjust_leverage(symbol="btcusdt", isolated=True, leverage=2)
+    #pprint.pprint(resp)
     #resp = exchange.create_limit_buy_order("btcusdt", "long", True, 0.001, 40000)
     #pprint.pprint(resp)
