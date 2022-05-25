@@ -19,21 +19,23 @@ class WebSocketManager:
         """client
         """
         uri = "wss://www.fairdesk.com/ws"
-        async with websockets.connect(uri, ping_interval=None) as websocket:
-            subscribe_req = {
-                "method": "SUBSCRIBE",
-                "params": self.stream,
-                "id": 1
-            }
-            await websocket.send(json.dumps(subscribe_req))
+        async for websocket in websockets.connect(uri, ping_interval=None):
+            try:
+                subscribe_req = {
+                    "method": "SUBSCRIBE",
+                    "params": self.stream,
+                    "id": 1
+                }
+                await websocket.send(json.dumps(subscribe_req))
 
-            while True:
-                try:
+                while True:
                     data = await websocket.recv()
                     data = json.loads(data)
                     self.queue.put(data)
-                except websockets.exceptions.ConnectionClosedError:
-                    self.queue.put("ConnectionClosedError")
+            except websockets.ConnectionClosed:
+                # https://websockets.readthedocs.io/en/stable/reference/client.html
+                self.queue.put("ConnectionClosedError")
+                continue
 
     def run(self):
         """_summary_

@@ -3,7 +3,8 @@
 import setuptools
 
 install_requires = [
-   'requests'
+   'requests',
+   'websockets'
 ]
 
 with open("README.md", "r", encoding='UTF-8') as fh:
